@@ -23,6 +23,7 @@
    "scripts": {
       "start": "ts-node src/index.ts",
       "start:dev": "nodemon --config nodemon.json",
-      "build": "tsc"
+      "build": "tsc",
+      "production": "node build/index.js --env=production"
    }
 }
