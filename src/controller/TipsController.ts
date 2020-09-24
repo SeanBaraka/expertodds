@@ -5,6 +5,8 @@ import * as authValidator from "../middleware/auth";
 import { User } from "../entity/User";
 import { fail } from "assert";
 import { FinishedMatch } from "../entity/FinishedMatch";
+import { REPLServer } from "repl";
+import { runInThisContext } from "vm";
 
 export class TipsController {
 
@@ -56,15 +58,49 @@ export class TipsController {
      * when the parameter is true, then it picks the vip tips otherwise
      * picks the free tips.
      */
-    getTips(isvip?: boolean) {
+    async getTips(isvip?: boolean) {
+        /** Introduced the iscomple flag to the tip object,
+         * it is used to determine whether a prediciton has been marked as
+         * complete or not
+         */
         if(isvip) {
-            return this.tipsRepository.find({
+            const premiumTips = await this.tipsRepository.find({
                 where: {
-                    isVip: true
+                    isVip: true ,
+                    isComplete: false
                 }
             })
+
+            /** Making sure that all tips that are updated do not appear here */
+            premiumTips.forEach(async (prediction) => {
+                const match = await this.finishedMatchesRepo.findOne({where:{
+                    fixture: {
+                        id: prediction.id
+                    }
+                }})
+
+                if(match != null) {
+                    await this.tipsRepository.update(prediction.id, {isComplete: true})
+                }
+            })
+            return premiumTips.filter((x) => x.isComplete == false);
+
         } else {
-            return this.tipsRepository.find({where: {isVip: false}})
+            const freeTips = await this.tipsRepository.find({where:{isVip: false, isComplete: false}});
+
+            freeTips.forEach(async (prediction) => {
+                const match = await this.finishedMatchesRepo.findOne({where:{
+                    fixture: {
+                        id: prediction.id
+                    }
+                }})
+
+                if(match != null) {
+                    await this.tipsRepository.update(prediction.id, {isComplete: true})
+                }
+            })
+
+            return freeTips.filter((x)=>x.isComplete == false);
         }
     }
 
@@ -107,14 +143,17 @@ export class TipsController {
 
         if(tipToEdit != null) {
 
+            const updatePrediction = await this.tipsRepository.update(tipId,{isComplete: true});
+
             const markFinished = await this.finishedMatchesRepo.save({
                 score: request.body.score,
-                isWon: request.body.iswon,
+                isWon: request.body.isWon,
                 fixture: tipToEdit
             })
 
             // on successful editing of a fixture
-            if(markFinished) {
+            
+            if(updatePrediction && markFinished) {
                 response.status(200)
 
                 const update_message = {
@@ -132,12 +171,15 @@ export class TipsController {
         }
     }
 
+
     /** Archives
      * Retrieving a list of all past matches. Predictions plus scores and possible winnings.
      */
     async archives(request: Request, response: Response) {
         const finishedmatches = await this.finishedMatchesRepo.find()
-        return finishedmatches;
+        const sortedMatches = finishedmatches.sort((a, b) => new Date(a.fixture.matchDate).getDate() - new Date(b.fixture.matchDate).getDate()).reverse()
+        
+        return sortedMatches;
     }
    
     /** Incase of any errors or typos in the prediction.
@@ -159,5 +201,21 @@ export class TipsController {
                 return update_message;
             }
         }
+    }
+
+    async getFeaturedMatch(request: Request, resp: Response) {
+        let featuredMatch = {};
+        let match = (await this.tipsRepository.find({ where: { isFeatured: true } })).pop();
+
+        /** Here, we use the difference in times to determine whether the 
+         * featured match is still valid. assumption is made that a featured match will have to change atleast once in 3 days
+         */
+        let dateDifference = new Date(match.matchDate).getDate() - new Date(Date.now()).getDate(); // getting the date difference
+        
+        if (dateDifference <= -1 && dateDifference > -3) {
+            featuredMatch = match
+        }
+        
+        return match;
     }
 }

@@ -22,6 +22,7 @@
    },
    "scripts": {
       "start": "ts-node src/index.ts",
-      "start:dev": "nodemon --config nodemon.json"
+      "start:dev": "nodemon --config nodemon.json",
+      "build": "tsc"
    }
 }

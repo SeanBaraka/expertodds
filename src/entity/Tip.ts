@@ -14,7 +14,7 @@ export class Tip {
     updatedAt: Date;
 
     @Column()
-    matchDate: Date;
+    matchDate: string;
 
     @Column()
     tournament: string;
@@ -26,19 +26,19 @@ export class Tip {
     away: string;
 
     @Column()
-    homeOdds: number;
+    homeOdds: string;
 
     @Column()
-    awayOdds: number;
+    awayOdds: string;
 
     @Column()
-    drawOdds: number;
+    drawOdds: string;
 
     @Column()
     prediction: string;
 
     @Column()
-    predictionOdds: number;
+    predictionOdds: string;
 
     @Column({
         default: false
@@ -49,6 +49,11 @@ export class Tip {
         default: false
     })
     isFeatured: boolean
+
+    @Column({
+        default: false
+    })
+    isComplete: boolean
 
     @OneToOne(type => FinishedMatch, finished => finished.fixture, {
         onDelete: 'CASCADE'

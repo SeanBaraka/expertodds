@@ -9,7 +9,7 @@ export const Routes = [{
     action: "all"
 }, {
     method: "get",
-    route: "/api/users/:id",
+    route: "/api/users/:email",
     controller: UserController,
     action: "one"
 }, {
@@ -95,6 +95,12 @@ export const Routes = [{
     route: '/api/tips/edit/:id',
     controller: TipsController,
     action: 'editprediction'
+},
+{
+    method: 'get',
+    route: '/api/tips/featured',
+    controller: TipsController,
+    action: 'getFeaturedMatch'
 }
 
 ];

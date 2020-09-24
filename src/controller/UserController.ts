@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 
 export class UserController {
 
+
     private userRepository = getRepository(User); // Initalizing the users repository
 
     private memberRepository = getRepository(Member); // Initializing the members repository
@@ -18,7 +19,7 @@ export class UserController {
 
     /** Will be used to show the details of a particular user. For instance in a profile/account view of an account */
     async one(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.findOne(request.params.id);
+        return this.userRepository.findOne({where: {email: request.params.email}});
     }
 
     /** User registration. Adding a user into the system */
@@ -36,7 +37,7 @@ export class UserController {
         user.email = userObject.email;
 
         // create a random salt for the user being registered
-        user.salt = randomBytes(16).toString('hex');
+        user.salt = randomBytes(16).toString('hex');        
 
         user.password = pbkdf2Sync(userObject.password, user.salt, 1000, 64, 'sha512').toString('hex');
 
@@ -44,14 +45,21 @@ export class UserController {
 
             const memberToRegister = this.memberRepository.save({
                 firstName: userObject.firstName,
-                lastName: userObject.email,
+                lastName: userObject.lastName,
                 telephone: userObject.telephone,
                 user: user
             })
     
-            return memberToRegister;
+            if (memberToRegister) {
+                const added_successfuly = {
+                    'message': 'account has been created successfuly'
+                }
+                response.status(201);
+                return added_successfuly;
+            }
 
         } catch (error) {
+            response.status(500)
             return error
         }
     }
@@ -62,6 +70,9 @@ export class UserController {
         dotenv.config();
 
         const loginRequest = request.body
+        
+        console.log(request.body);
+        
 
         //an object that holds the request body values
         let userToLogin = {
@@ -94,11 +105,13 @@ export class UserController {
                     'token': token
                 }
 
+                response.status(200)
                 return success_login;
 
             } else {
+                response.status(404);
                 const error_login = {
-                    "error": "incorrect login credentials"
+                    "error": "The password provided is incorrect"
                 }
 
                 return error_login;
@@ -108,6 +121,7 @@ export class UserController {
             const message = {
                 "error": "The given member does not exist"
             }
+            response.status(404);
             return message;
         }
 
