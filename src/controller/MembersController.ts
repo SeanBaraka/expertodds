@@ -1,6 +1,7 @@
 import { getRepository } from "typeorm";
 import { Member } from "../entity/Member";
 import { Request, Response, NextFunction } from "express";
+import { User } from "../entity/User";
 
 export class MembersController {
     private membersRepo = getRepository(Member);
@@ -12,8 +13,11 @@ export class MembersController {
 
     /** Adding the vip status of a user for them to receive premium tips */
     async makevip(request: Request, response: Response, next: NextFunction) {
-        let id = request.params.id
-        const member = await this.membersRepo.findOne(id);
+        let email = request.body.email;
+        const usersRepo = getRepository(User);
+        const user = await usersRepo.findOne({where: {email: email}});
+        const member = await this.membersRepo.findOne({where:{user:user}});
+        
         if (!member.isVip) {
             member.isVip = true;
             await this.membersRepo.save(member);
@@ -49,8 +53,13 @@ export class MembersController {
 
      /** Will be used to show the details of a particular user. For instance in a profile/account view of an account */
     async profile(request: Request, response: Response, next: NextFunction) {
-        const user = await this.membersRepo.findOne(request.params.id);
-        return user;
+        const reqBody = request.body;
+        const email = reqBody.email;
+        const usersRepo = getRepository(User);
+        const user = await usersRepo.findOne({where: {email: email}})
+        const member = await this.membersRepo.findOne({where: {user: user}});
+        
+        return member;
     }
 
 

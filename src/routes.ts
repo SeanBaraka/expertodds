@@ -42,7 +42,7 @@ export const Routes = [{
 },
 {
     method: 'post',
-    route: '/api/members/makevip/:id',
+    route: '/api/members/makevip/',
     controller: MembersController,
     action: 'makevip'
 },
@@ -53,8 +53,8 @@ export const Routes = [{
     action: 'revokevip'
 },
 {
-    method: 'get',
-    route: '/api/members/profile/:id',
+    method: 'post',
+    route: '/api/members/profile/',
     controller: MembersController,
     action: 'profile'
 },

@@ -71,8 +71,6 @@ export class UserController {
 
         const loginRequest = request.body
         
-        console.log(request.body);
-        
 
         //an object that holds the request body values
         let userToLogin = {
