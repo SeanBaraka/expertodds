@@ -83,7 +83,7 @@ export class TipsController {
                     await this.tipsRepository.update(prediction.id, {isComplete: true})
                 }
             })
-            return premiumTips.filter((x) => x.isComplete == false);
+            return premiumTips.filter((x) => x.isComplete == false).reverse();
 
         } else {
             const freeTips = await this.tipsRepository.find({where:{isVip: false, isComplete: false}});
@@ -100,7 +100,7 @@ export class TipsController {
                 }
             })
 
-            return freeTips.filter((x)=>x.isComplete == false);
+            return freeTips.filter((x)=>x.isComplete == false).reverse();
         }
     }
 
@@ -177,7 +177,7 @@ export class TipsController {
      */
     async archives(request: Request, response: Response) {
         const finishedmatches = await this.finishedMatchesRepo.find()
-        const sortedMatches = finishedmatches.sort((a, b) => new Date(a.fixture.matchDate).getDate() - new Date(b.fixture.matchDate).getDate()).reverse()
+        const sortedMatches = finishedmatches.sort((a, b) => new Date(a.fixture.matchDate).getMonth() - new Date(b.fixture.matchDate).getMonth()).reverse()
         
         return sortedMatches;
     }
