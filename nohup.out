@@ -6781,3 +6781,42 @@ npm ERR!     /root/.npm/_logs/2021-01-20T09_26_21_021Z-debug.log
 > node build/index.js --env=production
 
 Express server has started on port 3000. Open http://localhost:3000/ to see results
+
+> expertodds@0.0.1 production /root/expertodds
+> node build/index.js --env=production
+
+Express server has started on port 3000. Open http://localhost:3000/ to see results
+events.js:291
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (net.js:1317:16)
+    at listenInCluster (net.js:1365:12)
+    at Server.listen (net.js:1451:7)
+    at Function.listen (/root/expertodds/node_modules/express/lib/application.js:618:24)
+    at Object.<anonymous> (/root/expertodds/build/index.js:77:13)
+    at step (/root/expertodds/build/index.js:32:23)
+    at Object.next (/root/expertodds/build/index.js:13:53)
+    at /root/expertodds/build/index.js:7:71
+    at new Promise (<anonymous>)
+    at __awaiter (/root/expertodds/build/index.js:3:12)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (net.js:1344:8)
+    at processTicksAndRejections (internal/process/task_queues.js:84:21) {
+  code: 'EADDRINUSE',
+  errno: 'EADDRINUSE',
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+npm ERR! code ELIFECYCLE
+npm ERR! errno 1
+npm ERR! expertodds@0.0.1 production: `node build/index.js --env=production`
+npm ERR! Exit status 1
+npm ERR! 
+npm ERR! Failed at the expertodds@0.0.1 production script.
+npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /root/.npm/_logs/2021-02-15T20_11_29_557Z-debug.log

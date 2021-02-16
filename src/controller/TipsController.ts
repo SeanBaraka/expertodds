@@ -177,9 +177,9 @@ export class TipsController {
      */
     async archives(request: Request, response: Response) {
         const finishedmatches = await this.finishedMatchesRepo.find()
-        const sortedMatches = finishedmatches.sort((a, b) => new Date(a.fixture.matchDate).getMonth() - new Date(b.fixture.matchDate).getMonth()).reverse()
+        // const sortedMatches = finishedmatches.sort((a, b) => new Date(a.fixture.matchDate).getMonth() - new Date(b.fixture.matchDate).getMonth()).reverse()
         
-        return sortedMatches;
+        return finishedmatches.reverse();
     }
    
     /** Incase of any errors or typos in the prediction.
